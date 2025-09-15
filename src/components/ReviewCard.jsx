@@ -1,15 +1,19 @@
-// src/components/ReviewCard.jsx
 import React from "react";
 import styled from "styled-components";
 import { FaStar } from "react-icons/fa";
 
 const ReviewCard = ({ reviewData }) => {
+  const totalStars = 5; // 총 별 개수
+
   return (
     <Card>
       <Info>
         <Score>
-          {[...Array(reviewData.reviewScore)].map((_, i) => (
-            <FaStar key={i} color="#FFD700" />
+          {[...Array(totalStars)].map((_, i) => (
+            <FaStar
+              key={i}
+              color={i < reviewData.reviewScore ? "#FFD700" : "#ddd"} // 점수보다 작으면 노랑, 아니면 회색
+            />
           ))}
           <ScoreText>{reviewData.reviewScore}</ScoreText>
         </Score>
@@ -24,7 +28,6 @@ export default ReviewCard;
 
 const Card = styled.div`
   width: 100%;
-
   border: 1px solid #ddd;
   border-radius: 12px;
   padding: 16px;

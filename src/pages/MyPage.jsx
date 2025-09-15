@@ -5,14 +5,20 @@ import profile from "../constants/json/Profile.json";
 import post from "../constants/json/Post.json";
 import ProfileCard from "../components/ProfileCard";
 import ReviewCard from "../components/ReviewCard";
+import { useState } from "react";
+import CreatePostModal from "../components/CreatePostModal";
+import EditPostModal from "../components/EditPostModal";
+import ProfileEditModal from "../components/EditProfileModal";
 
 const MyPage = () => {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false); // 작성 모달
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // 수정 모달
+  const [isProfileEditOpen, setIsProfileEditOpen] = useState(false); // 프로필 수정 모달
   const hasPost = post.myPost !== null && post.myPost !== "";
 
   return (
     <PageContainer>
       <ContentWrapper>
-        {/* 좌측 프로필 */}
         <LeftSection>
           <ProfileCard
             name={profile.name}
@@ -20,10 +26,10 @@ const MyPage = () => {
             school={profile.school}
             email={profile.email}
             profileImageUrl={profile.profileImageUrl}
+            onEdit={() => setIsProfileEditOpen(true)}
           />
         </LeftSection>
 
-        {/* 우측 게시글 + 리뷰 */}
         <RightSection>
           {hasPost ? (
             <>
@@ -37,7 +43,9 @@ const MyPage = () => {
 
                 <PostHeader>
                   <PostTitle>{post.myPost}</PostTitle>
-                  <EditButton>게시글 수정하기</EditButton>
+                  <EditButton onClick={() => setIsEditModalOpen(true)}>
+                    게시글 수정하기
+                  </EditButton>
                 </PostHeader>
                 <PostContent>{post.myPostContent}</PostContent>
                 <HashTag>{post.hashTag}</HashTag>
@@ -53,11 +61,24 @@ const MyPage = () => {
           ) : (
             <CreatePostWrapper>
               <EmptyPostMessage>게시글을 작성해보세요!</EmptyPostMessage>
-              <CreatePostButton>게시글 작성하기</CreatePostButton>
+              <CreatePostButton onClick={() => setIsCreateModalOpen(true)}>
+                게시글 작성하기
+              </CreatePostButton>
             </CreatePostWrapper>
           )}
         </RightSection>
       </ContentWrapper>
+
+      {/* 모달 렌더링 */}
+      {isCreateModalOpen && (
+        <CreatePostModal onClose={() => setIsCreateModalOpen(false)} />
+      )}
+      {isEditModalOpen && (
+        <EditPostModal onClose={() => setIsEditModalOpen(false)} />
+      )}
+      {isProfileEditOpen && (
+        <ProfileEditModal onClose={() => setIsProfileEditOpen(false)} />
+      )}
     </PageContainer>
   );
 };
@@ -80,7 +101,7 @@ const ContentWrapper = styled.div`
 `;
 
 const LeftSection = styled.div`
-  flex: 0 0 280px; // 고정 폭
+  flex: 0 0 280px;
 `;
 
 const RightSection = styled.div`
@@ -188,4 +209,5 @@ const CreatePostButton = styled.button`
 const EmptyPostMessage = styled.p`
   color: #888;
   font-size: 15px;
+  margin-top: 200px;
 `;

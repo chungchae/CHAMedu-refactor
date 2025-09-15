@@ -1,12 +1,15 @@
 // src/pages/PostDetail.jsx
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import RequestCard from "../components/requestCard";
 import ReviewCard from "../components/ReviewCard";
 import post from "../constants/json/Post.json";
 import profile from "../constants/json/Profile.json";
+import ReviewModal from "../components/ReviewModal";
 
 const PostPage = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <PageContainer>
       <Container>
@@ -25,13 +28,16 @@ const PostPage = () => {
 
             <ReviewHeader>
               <h3>리뷰 {post.myReview.length}개</h3>
-              <ReviewButton>리뷰 작성하기</ReviewButton>
+              <ReviewButton onClick={() => setIsModalOpen(true)}>
+                리뷰 작성하기
+              </ReviewButton>
             </ReviewHeader>
 
             {post.myReview.map((review, idx) => (
               <ReviewCard key={idx} reviewData={review} />
             ))}
           </PostSection>
+
           <Sidebar>
             <RequestCard
               name={profile.name}
@@ -43,6 +49,8 @@ const PostPage = () => {
           </Sidebar>
         </PostBox>
       </Container>
+
+      {isModalOpen && <ReviewModal onClose={() => setIsModalOpen(false)} />}
     </PageContainer>
   );
 };
@@ -62,7 +70,7 @@ const Container = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center; /* 중앙 정렬 */
+  align-items: center;
   padding: 40px 20px;
 `;
 
@@ -72,11 +80,9 @@ const ImageSection = styled.div`
   flex-wrap: wrap;
   gap: 20px;
   margin-bottom: 40px;
-
   width: 90%;
   max-width: 1350px;
-
-  border-bottom: 2px solid #e0e0e0; /* 사진 아래 라인 */
+  border-bottom: 2px solid #e0e0e0;
   padding-bottom: 20px;
 `;
 
@@ -101,7 +107,7 @@ const PostSection = styled.div`
 const Sidebar = styled.div`
   flex: 1;
   position: sticky;
-  top: 20px; /* 화면 상단에서 띄울 거리 */
+  top: 20px;
   align-self: flex-start;
 `;
 

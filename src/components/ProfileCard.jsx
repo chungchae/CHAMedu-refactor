@@ -1,7 +1,14 @@
 import React from "react";
 import styled from "styled-components";
 
-const ProfileCard = ({ name, school, major, email, profileImageUrl }) => {
+const ProfileCard = ({
+  name,
+  school,
+  major,
+  email,
+  profileImageUrl,
+  onEdit,
+}) => {
   return (
     <Card>
       <ProfileImage src={profileImageUrl} alt="프로필" />
@@ -10,7 +17,7 @@ const ProfileCard = ({ name, school, major, email, profileImageUrl }) => {
         {school} {major}
       </Info>
       <Info>{email}</Info>
-      <Button>프로필 수정하기</Button>
+      <Button onClick={onEdit}>프로필 수정하기</Button>
     </Card>
   );
 };
