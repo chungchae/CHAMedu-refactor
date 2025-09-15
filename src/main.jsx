@@ -15,6 +15,7 @@ import MyPage from "./pages/MyPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import AllMentorsPage from "./pages/AllMentorsPage.jsx";
 import PostPage from "./pages/PostPage.jsx";
+import LoginLoading from "./pages/LoginLoading.jsx";
 
 const AppWrapper = () => {
   const location = useLocation();
@@ -31,6 +32,7 @@ const AppWrapper = () => {
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/post" element={<PostPage />} />
+        <Route path="/login/oauth2/callback/kakao" element={<LoginLoading />} />
       </Routes>
     </>
   );

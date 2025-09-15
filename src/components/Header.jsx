@@ -1,13 +1,18 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import LogoIcon from "../assets/images/logo.png";
+import { KAKAO_AUTH_URL } from "../auth/Auth";
 
 const Header = () => {
   const [selectedMenu, setSelectedMenu] = useState("/mentors"); // 로그인 후 기본 선택 메뉴
 
   const handleMenuClick = (path) => {
     setSelectedMenu(path);
+  };
+
+  const handleKakaoButtonClick = () => {
+    window.location.href = KAKAO_AUTH_URL;
   };
 
   return (
@@ -45,7 +50,7 @@ const Header = () => {
           마이페이지
         </MenuItem>
 
-        <LoginButton>로그인</LoginButton>
+        <LoginButton onClick={handleKakaoButtonClick}>로그인</LoginButton>
       </Menu>
     </HeaderContainer>
   );
