@@ -25,23 +25,21 @@ const AppWrapper = () => {
     <>
       {!noHeaderRoutes.includes(location.pathname) && <Header />}
       <Routes>
-        <Route path="/" element={<MentorsPage />} />
-        <Route path="/mentors" element={<MentorsPage />} />
-        <Route path="/allMentors" element={<AllMentorsPage />} />
-        <Route path="/chat" element={<ChatPage />} />
-        <Route path="/mypage" element={<MyPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/post" element={<PostPage />} />
-        <Route path="/login/oauth2/callback/kakao" element={<LoginLoading />} />
+        <Route path='/' element={<MentorsPage />} />
+        <Route path='/mentors' element={<MentorsPage />} />
+        <Route path='/allMentors' element={<AllMentorsPage />} />
+        <Route path='/chat' element={<ChatPage />} />
+        <Route path='/mypage' element={<MyPage />} />
+        <Route path='/login' element={<LoginPage />} />
+        <Route path='/post' element={<PostPage />} />
+        <Route path='/login/oauth2/callback/kakao' element={<LoginLoading />} />
       </Routes>
     </>
   );
 };
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <Router>
-      <AppWrapper />
-    </Router>
-  </StrictMode>
+  <Router>
+    <AppWrapper />
+  </Router>
 );
