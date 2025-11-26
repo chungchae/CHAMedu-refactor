@@ -1,208 +1,363 @@
-// src/components/ProfileEditModal.jsx
 import React, { useState } from "react";
 import styled from "styled-components";
-import { FaPen } from "react-icons/fa";
-import profileData from "../constants/json/Profile.json";
-import { FaTimes } from "react-icons/fa";
+import { Input, Select } from "antd";
+import axios from "axios";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-const EditProfileModal = ({ onClose }) => {
-  const [name, setName] = useState(profileData.name);
-  const [school, setSchool] = useState(profileData.school);
-  const [major, setMajor] = useState(profileData.major);
-  const [admissionType, setAdmissionType] = useState(profileData.admissionType);
-  const [profileImageUrl, setProfileImageUrl] = useState(
-    profileData.profileImageUrl
+const majorOptions = [
+  "인문사회",
+  "경상",
+  "경영",
+  "자연과학",
+  "공학IT",
+  "예체능",
+  "기타",
+];
+
+const recruitmentOptions = ["학종", "논술", "실기", "정시", "기타"];
+
+const EditProfileModal = ({ profile, onClose, onSuccess }) => {
+  const [nickname, setNickname] = useState(profile.nickname);
+  const [university, setUniversity] = useState(profile.university);
+  const [major, setMajor] = useState(profile.major || "기타");
+  const [recruitmentType, setRecruitmentType] = useState(
+    profile.recruitmentType || "기타"
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
-    console.log({ name, school, major, admissionType, profileImageUrl });
-    onClose();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!nickname || !university) {
+      alert("닉네임과 학교는 필수 입력란입니다.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const token = localStorage.getItem("token");
+      const updateData = {
+        nickname,
+        university,
+        major,
+        recruitmentType,
+      };
+
+      console.log("[PROFILE] PUT /api/member/me - payload:", updateData);
+
+      await axios.put(`${BASE_URL}/api/member/me`, updateData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      alert("프로필이 수정되었습니다!");
+      console.log("[PROFILE] 수정 성공");
+      onSuccess?.();
+      onClose();
+    } catch (error) {
+      console.error(
+        "[PROFILE] 수정 실패:",
+        error.response?.status,
+        error.response?.data || error.message
+      );
+      const serverMessage =
+        error.response?.data?.message || error.response?.data || error.message;
+      alert(`프로필 수정 중 오류가 발생했습니다.\n${serverMessage}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <Overlay>
+    <ModalOverlay>
       <ModalContainer>
-        <Header>
-          <ModalTitle>프로필 수정하기</ModalTitle>
+        <ModalHeader>
+          <HeaderContent>
+            <ModalTitle>프로필 수정</ModalTitle>
+            <ModalSubtitle>프로필 정보를 수정해주세요</ModalSubtitle>
+          </HeaderContent>
           <CloseButton onClick={onClose}>
-            <FaTimes size={20} />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
           </CloseButton>
-        </Header>
+        </ModalHeader>
 
-        <ContentWrapper>
-          <ImageWrapper>
-            <ProfileImage src={profileImageUrl} alt="프로필" />
-            <EditImageButton>
-              <FaPen size={18} />
-            </EditImageButton>
-          </ImageWrapper>
+        <Form onSubmit={handleSubmit}>
+          <InfoSection>
+            <InfoLabel>구분</InfoLabel>
+            <RoleDisplay>{profile.mentor ? "멘토" : "멘티"}</RoleDisplay>
+            <InfoNote>멘토/멘티 구분은 변경할 수 없습니다.</InfoNote>
+          </InfoSection>
 
-          <FieldWrapper>
-            <InputLabel>닉네임</InputLabel>
-            <TextInput value={name} onChange={(e) => setName(e.target.value)} />
-          </FieldWrapper>
-
-          <FieldWrapper>
-            <InputLabel>학교</InputLabel>
-            <TextInput
-              value={school}
-              onChange={(e) => setSchool(e.target.value)}
+          <FieldGroup>
+            <label htmlFor="nickname">닉네임</label>
+            <Input
+              id="nickname"
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="닉네임"
             />
-          </FieldWrapper>
+          </FieldGroup>
 
-          <FieldWrapper>
-            <InputLabel>전공 / 전형</InputLabel>
-            <SelectWrapper>
-              <Select value={major} onChange={(e) => setMajor(e.target.value)}>
-                <option value="인문사회">인문·사회</option>
-                <option value="경상">경상</option>
-                <option value="경영">경영</option>
-                <option value="자연과학">자연과학</option>
-                <option value="공학IT">공학IT</option>
-                <option value="예체능">예체능</option>
-                <option value="기타">기타</option>
-              </Select>
+          <FieldGroup>
+            <label htmlFor="university">학교</label>
+            <Input
+              id="university"
+              type="text"
+              value={university}
+              onChange={(e) => setUniversity(e.target.value)}
+              placeholder="학교"
+            />
+          </FieldGroup>
 
+          <DropdownGroup>
+            <FieldGroup>
+              <label htmlFor="major">전공</label>
               <Select
-                value={admissionType}
-                onChange={(e) => setAdmissionType(e.target.value)}
+                id="major"
+                value={major}
+                onChange={(value) => setMajor(value)}
               >
-                <option value="학종">학종</option>
-                <option value="논술">논술</option>
-                <option value="실기">실기</option>
-                <option value="정시">정시</option>
-                <option value="기타">기타</option>
+                {majorOptions.map((option) => (
+                  <Select.Option key={option} value={option}>
+                    {option}
+                  </Select.Option>
+                ))}
               </Select>
-            </SelectWrapper>
-          </FieldWrapper>
-        </ContentWrapper>
+            </FieldGroup>
 
-        <SubmitWrapper>
-          <SubmitButton onClick={handleSubmit}>제출하기</SubmitButton>
-        </SubmitWrapper>
+            <FieldGroup>
+              <label htmlFor="recruitmentType">전형</label>
+              <Select
+                id="recruitmentType"
+                value={recruitmentType}
+                onChange={(value) => setRecruitmentType(value)}
+              >
+                {recruitmentOptions.map((option) => (
+                  <Select.Option key={option} value={option}>
+                    {option}
+                  </Select.Option>
+                ))}
+              </Select>
+            </FieldGroup>
+          </DropdownGroup>
+
+          <SubmitButton type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "수정 중..." : "수정 완료"}
+          </SubmitButton>
+        </Form>
       </ModalContainer>
-    </Overlay>
+    </ModalOverlay>
   );
 };
 
 export default EditProfileModal;
 
-const Overlay = styled.div`
+const ModalOverlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
+  z-index: 50;
+  backdrop-filter: blur(4px);
 `;
 
 const ModalContainer = styled.div`
-  background: white;
-  padding: 24px;
-  border-radius: 9px;
-  width: 600px;
-  max-width: 90%;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-`;
-
-const ModalTitle = styled.h3`
-  text-align: center;
-  flex: 1;
-`;
-
-const CloseButton = styled.button`
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 18px;
-`;
-
-const ContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-const ImageWrapper = styled.div`
-  position: relative;
-  width: 120px;
-  margin: 0 auto 20px;
-`;
-
-const ProfileImage = styled.img`
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-`;
-
-const EditImageButton = styled.button`
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background: #4caf4f;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  padding: 6px;
-  cursor: pointer;
-`;
-
-const FieldWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-`;
-
-const InputLabel = styled.label`
-  font-weight: bold;
-`;
-
-const TextInput = styled.input`
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-`;
-
-const SelectWrapper = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const Select = styled.select`
-  flex: 1;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-`;
-
-const SubmitButton = styled.button`
-  background: #4caf4f;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 9px;
-  border: none;
-  cursor: pointer;
-  float: right;
-  margin-top: 30px;
-
-  &:hover {
-    background: #3a692c;
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 1.25rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 420px;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  animation: slideUp 0.3s ease-out;
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 `;
 
-const SubmitWrapper = styled.div`
+const ModalHeader = styled.div`
   display: flex;
-  justify-content: flex-end;
-  margin-top: 30px;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+`;
+
+const HeaderContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const ModalTitle = styled.h2`
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+`;
+
+const ModalSubtitle = styled.p`
+  font-size: 0.9rem;
+  color: #8b92a0;
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.4;
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: #8b92a0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    color: #1a1a1a;
+    transform: scale(1.1);
+  }
+  
+  svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2;
+  }
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+`;
+
+const InfoSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f9f9fb;
+  border-radius: 0.875rem;
+`;
+
+const InfoLabel = styled.label`
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: -0.3px;
+`;
+
+const RoleDisplay = styled.div`
+  font-size: 1.08rem;
+  color: #4caf4f;
+  font-weight: 600;
+`;
+
+const InfoNote = styled.p`
+  font-size: 0.8rem;
+  color: #8b92a0;
+  margin: 0;
+  margin-top: 0.25rem;
+`;
+
+const FieldGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  
+  label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    letter-spacing: -0.3px;
+  }
+  
+  .ant-input,
+  .ant-select-selector {
+    height: 44px;
+    border-radius: 0.875rem;
+    border: 1.5px solid #e5e7eb;
+    background-color: #f9f9fb;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      border-color: #d1d5db;
+      background-color: #fff;
+    }
+    
+    &:focus,
+    &.ant-input-focused,
+    &.ant-select-focused .ant-select-selector {
+      border-color: #4caf4f !important;
+      background-color: #fff !important;
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1) !important;
+    }
+  }
+  
+  .ant-input::placeholder {
+    color: #bcc1ca;
+  }
+`;
+
+const DropdownGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+`;
+
+const SubmitButton = styled.button`
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  height: 48px;
+  background-color: #4caf4f;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.975rem;
+  border-radius: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: -0.3px;
+  margin-top: 0.5rem;
+  
+  &:hover:not(:disabled) {
+    background-color: #3d9842;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.25);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 `;
