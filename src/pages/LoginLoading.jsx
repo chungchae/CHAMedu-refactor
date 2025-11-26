@@ -27,16 +27,31 @@ const LoginLoading = () => {
           headers: { "Content-Type": "text/plain" },
         });
 
-        const { newUser, email, nickname } = res.data;
-        console.log("[KAKAO] User data received:", { newUser, email, nickname });
+        const { newUser, email, nickname, token, role } = res.data;
+        console.log("[KAKAO] User data received:", { newUser, email, nickname, token });
 
-        setUserData({ email, nickname });
+        setUserData({ email, nickname, token });
+        localStorage.setItem("token", token);
 
         if (newUser) {
           // 신규 사용자라면 프로필 설정 모달을 표시
           setShowProfileModal(true);
         } else {
-          // 기존 사용자라면 바로 메인 페이지로 이동
+          // 기존 사용자라면 로컬스토리지에 저장 후 메인 페이지로 이동
+          const existingUserData = {
+            name: nickname,
+            nickname: nickname,
+            email: email,
+            token: token,
+            role: role,
+            loginTime: new Date().toISOString(),
+          };
+          localStorage.setItem("user", JSON.stringify(existingUserData));
+          console.log("[LOGIN] User data saved to localStorage:");
+          console.log("  - nickname:", nickname);
+          console.log("  - email:", email);
+          console.log("  - token:", token || "없음");
+          console.log("  - 전체 저장 데이터:", existingUserData);
           navigate("/");
         }
       } catch (error) {
