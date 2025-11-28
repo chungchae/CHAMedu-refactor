@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { message } from "antd";
 import LogoIcon from "../assets/images/logo.png";
 import { KAKAO_AUTH_URL } from "../auth/Auth";
 
@@ -9,12 +10,14 @@ const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
 
+  const navigate = useNavigate(); 
+
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
       const parsedUser = JSON.parse(userData);
       setIsLoggedIn(true);
-      setUserName(parsedUser.name || "사용자");
+      setUserName(parsedUser.nickname || "사용자");
       console.log("로그인 상태 감지:");
       console.log("사용자 정보:", parsedUser);
     } else {
@@ -26,16 +29,24 @@ const Header = () => {
     setSelectedMenu(path);
   };
 
-  const handleKakaoButtonClick = () => {
-    window.location.href = KAKAO_AUTH_URL;
-  };
-
   const handleLogout = () => {
     // 로컬스토리지에서 사용자 정보 삭제
     localStorage.removeItem("user");
     setIsLoggedIn(false);
     setUserName("");
     console.log("🚪 로그아웃 완료 - 로컬스토리지 user 데이터 삭제됨");
+    
+    // antd message로 알림 표시
+    message.success("로그아웃되었습니다");
+    
+    // 메인 페이지로 자동 리다이렉트
+    setTimeout(() => {
+      navigate("/mentors");
+    }, 500);
+  };
+
+  const handleLoginClick = () => {
+    navigate("/login");
   };
 
   return (
@@ -79,7 +90,7 @@ const Header = () => {
             <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
           </UserSection>
         ) : (
-          <LoginButton onClick={handleKakaoButtonClick}>로그인</LoginButton>
+          <LoginButton onClick={handleLoginClick}>로그인</LoginButton>
         )}
       </Menu>
     </HeaderContainer>
