@@ -22,6 +22,7 @@ const ProfileSetupModal = ({ userEmail, onProfileSubmit, onClose }) => {
   const [recruitmentType, setRecruitmentType] = useState(recruitmentOptions[0]);
   const [major, setMajor] = useState(majorOptions[0]);
   const [error, setError] = useState("");
+  const role = isMentor ? "MENTOR" : "MENTEE";
 
   const handleMentorClick = () => setIsMentor(true);
   const handleMenteeClick = () => setIsMentor(false);

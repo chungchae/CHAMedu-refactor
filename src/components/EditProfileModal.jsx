@@ -34,22 +34,26 @@ const EditProfileModal = ({ profile, onClose, onSuccess }) => {
 
     setIsSubmitting(true);
     try {
-      const token = localStorage.getItem("token");
+      const userData = localStorage.getItem("user");
+      if (!userData) {
+        alert("로그인 정보가 없습니다.");
+        return;
+      }
+
+      const user = JSON.parse(userData);
+      const email = user.email;
+
       const updateData = {
+        email,
         nickname,
         university,
         major,
         recruitmentType,
       };
 
-      console.log("[PROFILE] PUT /api/member/me - payload:", updateData);
+      console.log("[PROFILE] POST /api/member/profile - payload:", updateData);
 
-      await axios.put(`${BASE_URL}/api/member/me`, updateData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      await axios.post(`${BASE_URL}/api/member/profile`, updateData);
 
       alert("프로필이 수정되었습니다!");
       console.log("[PROFILE] 수정 성공");
