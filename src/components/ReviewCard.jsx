@@ -12,7 +12,7 @@ const ReviewCard = ({ reviewData }) => {
           {[...Array(totalStars)].map((_, i) => (
             <FaStar
               key={i}
-              color={i < reviewData.reviewScore ? "#FFD700" : "#ddd"} // 점수보다 작으면 노랑, 아니면 회색
+              color={i < reviewData.reviewScore ? "#FFD700" : "#ddd"}
             />
           ))}
           <ScoreText>{reviewData.reviewScore}</ScoreText>
@@ -28,11 +28,13 @@ export default ReviewCard;
 
 const Card = styled.div`
   width: 100%;
-  border: 1px solid #ddd;
+  max-width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #f0f0f0;
   border-radius: 12px;
-  padding: 16px;
+  padding: 12px 14px;
   background-color: #fff;
-  margin-bottom: 16px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
 `;
 
 const Info = styled.div`
@@ -55,13 +57,13 @@ const ScoreText = styled.span`
 `;
 
 const DateText = styled.span`
-  font-size: 14px;
-  color: #888;
+  font-size: 13px;
+  color: #9aa0a8;
 `;
 
 const Content = styled.p`
-  margin-top: 12px;
+  margin-top: 10px;
   font-size: 15px;
-  color: #000000;
-  line-height: 1.4;
+  color: #111;
+  line-height: 1.6;
 `;
